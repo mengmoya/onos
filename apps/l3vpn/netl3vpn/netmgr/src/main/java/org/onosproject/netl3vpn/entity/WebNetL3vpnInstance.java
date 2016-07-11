@@ -2,18 +2,20 @@ package org.onosproject.netl3vpn.entity;
 
 import java.util.List;
 
-public class WebL3vpnInstance {
+public class WebNetL3vpnInstance {
     private String id;
     private String name;
     private TopoModeType mode;
     private List<String> neIdList;
     private List<WebAc> acList;
-
+    
     /**
      * The enumeration of topo mode type.
      */
     public enum TopoModeType {
-        None(0), HubSpoke(1), FullMesh(2);
+        None(0),
+        HubSpoke(1),
+        FullMesh(2);
 
         int value;
 
@@ -65,5 +67,5 @@ public class WebL3vpnInstance {
     public void setAcList(List<WebAc> acList) {
         this.acList = acList;
     }
-
+    
 }

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.onosproject.netl3vpn.entity.WebAc;
-import org.onosproject.netl3vpn.entity.WebL3vpnInstance;
-import org.onosproject.netl3vpn.entity.WebL3vpnInstance.TopoModeType;
+import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
+import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance.TopoModeType;
 import org.onosproject.netl3vpn.util.ConvertUtil;
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.acgroup.acs.Ac;
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.Instance;
@@ -22,22 +22,22 @@ public class NetL3vpnParse {
         this.instance = instance;
     }
 
-    public WebL3vpnInstance cfgParse() {
+    public WebNetL3vpnInstance cfgParse() {
         checkNotNull(instance, INSTANCE_NOT_NULL);
-        WebL3vpnInstance webL3vpnInstance = new WebL3vpnInstance();
-        webL3vpnInstance.setId(instance.id());
-        webL3vpnInstance.setName(instance.name());
-        webL3vpnInstance.setMode(TopoModeType.valueOf("FullMesh"));
+        WebNetL3vpnInstance webNetL3vpnInstance = new WebNetL3vpnInstance();
+        webNetL3vpnInstance.setId(instance.id());
+        webNetL3vpnInstance.setName(instance.name());
+        webNetL3vpnInstance.setMode(TopoModeType.valueOf("FullMesh"));
         List<String> neIdList = new ArrayList<String>();
         for (Ne ne : instance.nes().ne()) {
             neIdList.add(ne.id());
         }
-        webL3vpnInstance.setNeIdList(neIdList);
+        webNetL3vpnInstance.setNeIdList(neIdList);
         List<WebAc> webAcs = new ArrayList<WebAc>();
         for (Ac ac : instance.acs().ac()) {
             webAcs.add(ConvertUtil.convertToWebAc(ac));
         }
-        webL3vpnInstance.setAcList(webAcs);
-        return webL3vpnInstance;
+        webNetL3vpnInstance.setAcList(webAcs);
+        return webNetL3vpnInstance;
     }
 }

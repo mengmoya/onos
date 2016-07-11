@@ -8,8 +8,7 @@ import org.onosproject.incubator.net.resource.label.LabelResource;
 import org.onosproject.incubator.net.resource.label.LabelResourceAdminService;
 import org.onosproject.incubator.net.resource.label.LabelResourceId;
 import org.onosproject.incubator.net.resource.label.LabelResourceService;
-import org.onosproject.netl3vpn.entity.WebL3vpnInstance;
-import org.onosproject.netl3vpn.store.NetL3vpnStore;
+import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,17 +20,14 @@ public class NetL3vpnLabelResource {
     private static final String VRF_PREFIX = "VRF_";
     private LabelResourceAdminService labelRsrcAdminService;
     private LabelResourceService labelRsrcService;
-    private NetL3vpnStore netL3vpnStore;
-    private WebL3vpnInstance webL3vpnInstance;
+    private WebNetL3vpnInstance webNetL3vpnInstance;
 
     public NetL3vpnLabelResource(LabelResourceAdminService labelRsrcAdminService,
                                  LabelResourceService labelRsrcService,
-                                 NetL3vpnStore netL3vpnStore,
-                                 WebL3vpnInstance webL3vpnInstance) {
+                                 WebNetL3vpnInstance webNetL3vpnInstance) {
         this.labelRsrcAdminService = labelRsrcAdminService;
         this.labelRsrcService = labelRsrcService;
-        this.netL3vpnStore = netL3vpnStore;
-        this.webL3vpnInstance = webL3vpnInstance;
+        this.webNetL3vpnInstance = webNetL3vpnInstance;
     }
 
     public String allocateResource(String allocateType) {
@@ -47,12 +43,12 @@ public class NetL3vpnLabelResource {
             specificLabelId = defaultLabelResource.labelResourceId();
             if (specificLabelId == null) {
                 log.error("Unable to retrieve {} label for a vpn id {}.",
-                          allocateType, webL3vpnInstance.getId());
+                          allocateType, webNetL3vpnInstance.getId());
                 return null;
             }
         } else {
             log.error("Unable to allocate {} label for a vpn id {}.",
-                      allocateType, webL3vpnInstance.getId());
+                      allocateType, webNetL3vpnInstance.getId());
             return null;
         }
 
@@ -65,7 +61,7 @@ public class NetL3vpnLabelResource {
             return VRF_PREFIX + specificLabelId.id();
         default:
             log.error("Unable to allocate {} label for a vpn id {}.",
-                      allocateType, webL3vpnInstance.getId());
+                      allocateType, webNetL3vpnInstance.getId());
             return null;
         }
     }
