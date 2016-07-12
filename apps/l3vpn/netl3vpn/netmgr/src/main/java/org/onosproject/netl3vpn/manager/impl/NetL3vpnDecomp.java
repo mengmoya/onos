@@ -16,19 +16,18 @@ import org.onosproject.net.DeviceId;
 import org.onosproject.net.Port;
 import org.onosproject.net.PortNumber;
 import org.onosproject.net.device.DeviceService;
-import org.onosproject.netl3vpn.entity.L3VpnAllocateRes;
 import org.onosproject.netl3vpn.entity.WebAc;
-import org.onosproject.netl3vpn.entity.WebL3vpnInstance;
+import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 
 public class NetL3vpnDecomp {
-    private WebL3vpnInstance webL3vpnInstance;
-    private L3VpnAllocateRes l3VpnAllocateRes;
+    private WebNetL3vpnInstance webNetL3vpnInstance;
+    private NetL3VpnAllocateRes l3VpnAllocateRes;
     private DeviceService deviceService;
 
-    public NetL3vpnDecomp(WebL3vpnInstance webL3vpnInstance,
-                          L3VpnAllocateRes l3VpnAllocateRes,
+    public NetL3vpnDecomp(WebNetL3vpnInstance webNetL3vpnInstance,
+                          NetL3VpnAllocateRes l3VpnAllocateRes,
                           DeviceService deviceService) {
-        this.webL3vpnInstance = webL3vpnInstance;
+        this.webNetL3vpnInstance = webNetL3vpnInstance;
         this.l3VpnAllocateRes = l3VpnAllocateRes;
         this.deviceService = deviceService;
     }
@@ -39,7 +38,7 @@ public class NetL3vpnDecomp {
 
         Map<String, List<String>> acIdsByNeMap = new HashMap<String, List<String>>();
         Map<String, List<WebAc>> acsByNeMap = new HashMap<String, List<WebAc>>();
-        for (WebAc webAc : webL3vpnInstance.getAcList()) {
+        for (WebAc webAc : webNetL3vpnInstance.getAcList()) {
             String neId = webAc.getNeId();
             List<String> acIdsByNeList = acIdsByNeMap.get(neId);
             if (acIdsByNeList == null) {
@@ -63,9 +62,9 @@ public class NetL3vpnDecomp {
 
     public List<VpnInstance> decompVpnInstance(Map<String, List<String>> acIdsByNeMap) {
         List<VpnInstance> vpnInstanceList = new ArrayList<VpnInstance>();
-        for (String neId : webL3vpnInstance.getNeIdList()) {
-            String vrfName = webL3vpnInstance.getName();
-            String netVpnId = webL3vpnInstance.getId();
+        for (String neId : webNetL3vpnInstance.getNeIdList()) {
+            String vrfName = webNetL3vpnInstance.getName();
+            String netVpnId = webNetL3vpnInstance.getId();
             String routeDistinguisher = l3VpnAllocateRes
                     .getRouteDistinguisher();
             List<String> importTargets = l3VpnAllocateRes.getRouteTargets();
@@ -91,8 +90,8 @@ public class NetL3vpnDecomp {
 
     public List<VpnAc> decompVpnAc(Map<String, List<WebAc>> acsByNeMap) {
         List<VpnAc> vpnAcList = new ArrayList<VpnAc>();
-        String netVpnId = webL3vpnInstance.getId();
-        for (String neId : webL3vpnInstance.getNeIdList()) {
+        String netVpnId = webNetL3vpnInstance.getId();
+        for (String neId : webNetL3vpnInstance.getNeIdList()) {
             List<WebAc> webAcList = acsByNeMap.get(neId);
             for (WebAc webAc : webAcList) {
                 String acId = webAc.getId();

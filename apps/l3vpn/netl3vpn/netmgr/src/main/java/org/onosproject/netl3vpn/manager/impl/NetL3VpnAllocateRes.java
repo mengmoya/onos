@@ -1,8 +1,8 @@
-package org.onosproject.netl3vpn.entity;
+package org.onosproject.netl3vpn.manager.impl;
 
 import java.util.List;
 
-public class L3VpnAllocateRes {
+public class NetL3VpnAllocateRes {
     private List<String> routeTargets;
     private String routeDistinguisher;
     private String vrfName;
