@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016-present Open Networking Laboratory
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.onosproject.netl3vpn.util;
 
 import org.onosproject.netl3vpn.entity.WebAc;
@@ -10,11 +25,20 @@ import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.acgroup.acs.ac
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.acgroup.acs.ac.L3Access;
 import org.onosproject.yang.gen.v1.net.l3vpn.type.rev20160701.netl3vpntype.l2access.Port;
 
+/**
+ * Convert utility class.
+ */
 public final class ConvertUtil {
-    private ConvertUtil() {
 
+    private ConvertUtil() {
     }
 
+    /**
+     * Hanle the enum value to specific format.
+     *
+     * @param enumValue enum value
+     * @return converted value
+     */
     public static String handleEnumValue(String enumValue) {
         StringBuffer strBuf = new StringBuffer();
         if (enumValue != null && !enumValue.equals("")) {
@@ -35,32 +59,47 @@ public final class ConvertUtil {
         return null;
     }
 
+    /**
+     * Convert Ac to WebAc.
+     *
+     * @param ac ac
+     * @return WebAc
+     */
     public static WebAc convertToWebAc(Ac ac) {
-        WebAc webAc = new WebAc();
-        webAc.setId(ac.id());
-        webAc.setNeId(ac.neId());
-        webAc.setL2Access(convertToWebL2Access(ac.l2Access()));
-        webAc.setL3Access(convertToWebL3Access(ac.l3Access()));
-        return webAc;
+        return new WebAc(ac.id(), ac.neId(),
+                         convertToWebL2Access(ac.l2Access()),
+                         convertToWebL3Access(ac.l3Access()));
     }
 
+    /**
+     * Convert L2Access to WebL2Access.
+     *
+     * @param l2Access l2 access
+     * @return WebL2Access
+     */
     public static WebL2Access convertToWebL2Access(L2Access l2Access) {
-        WebL2Access webL2Access = new WebL2Access();
-        webL2Access.setAccessType(L2AccessType
-                .valueOf(handleEnumValue(l2Access.accessType())));
-        webL2Access.setPort(convertToWebPort(l2Access.port()));
-        return webL2Access;
+        return new WebL2Access(L2AccessType
+                .valueOf(handleEnumValue(l2Access.accessType())),
+                               convertToWebPort(l2Access.port()));
     }
 
+    /**
+     * Convert Port to WebPort.
+     *
+     * @param port port
+     * @return WebPort
+     */
     public static WebPort convertToWebPort(Port port) {
-        WebPort webPort = new WebPort();
-        webPort.setLtpId(port.ltpId());
-        return webPort;
+        return new WebPort(port.ltpId());
     }
 
+    /**
+     * Convert L3Access to WebL3Access.
+     *
+     * @param l3Access l3 Access
+     * @return WebL3Access
+     */
     public static WebL3Access convertToWebL3Access(L3Access l3Access) {
-        WebL3Access webL3Access = new WebL3Access();
-        webL3Access.setAddress(l3Access.address().string());
-        return webL3Access;
+        return new WebL3Access(l3Access.address().string());
     }
 }
