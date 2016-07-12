@@ -57,8 +57,7 @@ public class NetL3vpnDecomp {
 
         vpnInstanceList = decompVpnInstance(acIdsByNeMap);
         vpnAcList = decompVpnAc(acsByNeMap);
-        NeData neData = new NeData(vpnInstanceList, vpnAcList);
-        return neData;
+        return new NeData(vpnInstanceList, vpnAcList);
     }
 
     public List<VpnInstance> decompVpnInstance(Map<String, List<String>> acIdsByNeMap) {
