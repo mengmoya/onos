@@ -192,19 +192,19 @@ public final class DataConvertUtil {
             for (BgpImportProtocol importPro : bgp.importProtocols()) {
                 ImportRouteBuilder importRouteBuilder = new ImportRouteBuilder();
                 switch (importPro.protocolType()) {
-                case Direct:
+                case DIRECT:
                     importRouteBuilder
                             .importProtocol(new BgpcommImRouteProtocol(BgpcommImRouteProtocolEnum.DIRECT));
                     break;
-                case Bgp:
+                case BGP:
                     importRouteBuilder
                             .importProtocol(new BgpcommImRouteProtocol(BgpcommImRouteProtocolEnum.STATIC));
                     break;
-                case Isis:
+                case ISIS:
                     importRouteBuilder
                             .importProtocol(new BgpcommImRouteProtocol(BgpcommImRouteProtocolEnum.ISIS));
                     break;
-                case Ospf:
+                case OSPF:
                     importRouteBuilder
                             .importProtocol(new BgpcommImRouteProtocol(BgpcommImRouteProtocolEnum.OSPF));
                     break;

@@ -71,7 +71,7 @@ public class NetL3vpnDecomp {
             List<String> exportTargets = l3VpnAllocateRes.getRouteTargets();
             List<String> acIdList = acIdsByNeMap.get(neId);
 
-            BgpImportProtocol bgpImportProtocol = new BgpImportProtocol(ProtocolType.Direct);
+            BgpImportProtocol bgpImportProtocol = new BgpImportProtocol(ProtocolType.DIRECT);
             List<BgpImportProtocol> importProtocols = new ArrayList<BgpImportProtocol>();
             importProtocols.add(bgpImportProtocol);
             Bgp bgp = new Bgp(importProtocols);
