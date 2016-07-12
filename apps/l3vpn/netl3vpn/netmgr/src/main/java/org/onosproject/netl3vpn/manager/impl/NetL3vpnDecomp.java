@@ -16,6 +16,7 @@ import org.onosproject.net.DeviceId;
 import org.onosproject.net.Port;
 import org.onosproject.net.PortNumber;
 import org.onosproject.net.device.DeviceService;
+import org.onosproject.netl3vpn.entity.NetL3VpnAllocateRes;
 import org.onosproject.netl3vpn.entity.WebAc;
 import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 
@@ -56,8 +57,7 @@ public class NetL3vpnDecomp {
 
         vpnInstanceList = decompVpnInstance(acIdsByNeMap);
         vpnAcList = decompVpnAc(acsByNeMap);
-        NeData neData = new NeData(vpnInstanceList, vpnAcList);
-        return neData;
+        return new NeData(vpnInstanceList, vpnAcList);
     }
 
     public List<VpnInstance> decompVpnInstance(Map<String, List<String>> acIdsByNeMap) {

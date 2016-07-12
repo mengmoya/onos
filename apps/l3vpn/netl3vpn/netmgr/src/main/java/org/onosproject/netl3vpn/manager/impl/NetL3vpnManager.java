@@ -24,6 +24,7 @@ import org.onosproject.ne.VpnInstance;
 import org.onosproject.ne.manager.L3vpnNeService;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.device.DeviceService;
+import org.onosproject.netl3vpn.entity.NetL3VpnAllocateRes;
 import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 import org.onosproject.netl3vpn.manager.NetL3vpnService;
 import org.onosproject.store.serializers.KryoNamespaces;
@@ -89,17 +90,17 @@ public class NetL3vpnManager implements NetL3vpnService {
                 .register(KryoNamespaces.API).register(VpnInstance.class)
                 .register(WebNetL3vpnInstance.class).register(VpnAc.class);
         webNetL3vpnStore = storageService
-                .<String, WebNetL3vpnInstance> eventuallyConsistentMapBuilder()
+                .<String, WebNetL3vpnInstance>eventuallyConsistentMapBuilder()
                 .withName(NETL3INSTANCESTORE).withSerializer(serializer)
                 .withTimestampProvider((k, v) -> clockService.getTimestamp())
                 .build();
         vpnInstanceStore = storageService
-                .<String, VpnInstance> eventuallyConsistentMapBuilder()
+                .<String, VpnInstance>eventuallyConsistentMapBuilder()
                 .withName(NEL3INSTANCESTORE).withSerializer(serializer)
                 .withTimestampProvider((k, v) -> clockService.getTimestamp())
                 .build();
         vpnAcStore = storageService
-                .<String, VpnAc> eventuallyConsistentMapBuilder()
+                .<String, VpnAc>eventuallyConsistentMapBuilder()
                 .withName(NEL3ACSTORE).withSerializer(serializer)
                 .withTimestampProvider((k, v) -> clockService.getTimestamp())
                 .build();
@@ -124,18 +125,25 @@ public class NetL3vpnManager implements NetL3vpnService {
             return false;
         }
         webNetL3vpnStore.put(webNetL3vpnInstance.getId(), webNetL3vpnInstance);
-        if (!handleResource()) {
+        if (!checkOccupiedResource()) {
+            log.debug("The resource of l3vpn instance is occupied.");
             return false;
         }
-        NeData neData = new NetL3vpnDecomp(webNetL3vpnInstance, l3VpnAllocateRes,
-                                           deviceService).decompNeData();
+        l3VpnAllocateRes = applyResource();
+        if (l3VpnAllocateRes == null) {
+            log.debug("Apply resources of l3vpn instance failed.");
+            return false;
+        }
+        NeData neData = new NetL3vpnDecomp(webNetL3vpnInstance,
+                                           l3VpnAllocateRes, deviceService)
+                                                   .decompNeData();
         for (VpnInstance vpnInstance : neData.vpnInstanceList()) {
             vpnInstanceStore.put(vpnInstance.neId(), vpnInstance);
         }
         for (VpnAc vpnAc : neData.vpnAcList()) {
             vpnAcStore.put(vpnAc.acId(), vpnAc);
         }
-        
+
         return l3vpnNeService.createL3vpn(neData);
     }
 
@@ -160,20 +168,9 @@ public class NetL3vpnManager implements NetL3vpnService {
         return false;
     }
 
-    public boolean handleResource() {
-        if (!checkOccupiedResource()) {
-            log.debug("The resource of l3vpn instance is occupied.");
-            return false;
-        }
-        if (!applyResource()) {
-            log.debug("Apply resources of l3vpn instance failed.");
-            return false;
-        }
-        return true;
-    }
-
     public boolean checkOccupiedResource() {
-        for (Entry<String, WebNetL3vpnInstance> entry : webNetL3vpnStore.entrySet()) {
+        for (Entry<String, WebNetL3vpnInstance> entry : webNetL3vpnStore
+                .entrySet()) {
             if (entry.getValue().getName() == webNetL3vpnInstance.getName()) {
                 return false;
             }
@@ -181,7 +178,7 @@ public class NetL3vpnManager implements NetL3vpnService {
         return true;
     }
 
-    public boolean applyResource() {
+    public NetL3VpnAllocateRes applyResource() {
         NetL3vpnLabelResource netL3vpnLabelResource = new NetL3vpnLabelResource(labelRsrcAdminService,
                                                                                 labelRsrcService,
                                                                                 webNetL3vpnInstance);
@@ -190,14 +187,11 @@ public class NetL3vpnManager implements NetL3vpnService {
         String vrfName = netL3vpnLabelResource.allocateResource(VRF);
         if (routeTarget == null || routeDistinguisher == null
                 || vrfName == null) {
-            return false;
+            return null;
         }
 
         List<String> routeTargets = new ArrayList<String>();
         routeTargets.add(routeTarget);
-        l3VpnAllocateRes.setRouteDistinguisher(routeDistinguisher);
-        l3VpnAllocateRes.setRouteTargets(routeTargets);
-        l3VpnAllocateRes.setVrfName(vrfName);
-        return true;
+        return new NetL3VpnAllocateRes(routeTargets, routeDistinguisher, vrfName);
     }
 }
