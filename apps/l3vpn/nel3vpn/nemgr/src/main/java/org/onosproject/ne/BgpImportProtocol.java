@@ -49,10 +49,10 @@ public final class BgpImportProtocol {
      * The enumeration of bgp protocol type.
      */
     public enum ProtocolType {
-        Direct(0),
-        Bgp(1),
-        Ospf(2),
-        Isis(3);
+        DIRECT(0),
+        BGP(1),
+        OSPF(2),
+        ISIS(3);
 
         int value;
 

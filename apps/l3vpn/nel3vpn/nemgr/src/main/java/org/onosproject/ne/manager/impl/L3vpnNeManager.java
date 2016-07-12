@@ -68,10 +68,22 @@ import org.onosproject.store.service.StorageService;
 import org.onosproject.yang.gen.v1.l3vpn.comm.type.rev20141225.nel3vpncommtype.Ipv4Address;
 import org.onosproject.yang.gen.v1.l3vpn.comm.type.rev20141225.nel3vpncommtype.L3VpncommonL3VpnPrefixType;
 import org.onosproject.yang.gen.v1.l3vpn.comm.type.rev20141225.nel3vpncommtype.L3VpncommonVrfRtType;
+import org.onosproject.yang.gen.v1.l3vpn.comm.type.rev20141225.nel3vpncommtype.l3vpncommonl3vpnprefixtype.L3VpncommonL3VpnPrefixTypeEnum;
 import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.Bgpcomm;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.BgpcommBuilder.BgpcommImpl;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.BgpVrfsBuilder.BgpVrfsImpl;
 import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.BgpVrf;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.BgpVrfBuilder.BgpVrfImpl;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.bgpvrf.BgpVrfAfsBuilder.BgpVrfAfsImpl;
 import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.bgpvrf.bgpvrfafs.BgpVrfAf;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.bgpvrf.bgpvrfafs.BgpVrfAfBuilder.BgpVrfAfImpl;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.bgpvrf.bgpvrfafs.bgpvrfaf.ImportRoutesBuilder.ImportRoutesImpl;
 import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.bgpvrf.bgpvrfafs.bgpvrfaf.importroutes.ImportRoute;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.rev20141225.nebgpcomm.bgpcomm.bgpvrfs.bgpvrf.bgpvrfafs.bgpvrfaf.importroutes.ImportRouteBuilder.ImportRouteImpl;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.type.rev20141225.nebgpcommtype.BgpcommImRouteProtocol;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.type.rev20141225.nebgpcommtype.BgpcommPrefixType;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.type.rev20141225.nebgpcommtype.bgpcommimrouteprotocol.BgpcommImRouteProtocolEnum;
+import org.onosproject.yang.gen.v1.ne.bgpcomm.type.rev20141225.nebgpcommtype.bgpcommprefixtype.BgpcommPrefixTypeEnum;
 import org.onosproject.yang.gen.v1.ne.l3vpn.api.rev20141225.nel3vpnapi.L3VpnInstances;
 import org.onosproject.yang.gen.v1.ne.l3vpn.api.rev20141225.nel3vpnapi.L3VpnInstancesBuilder.L3VpnInstancesImpl;
 import org.onosproject.yang.gen.v1.ne.l3vpn.api.rev20141225.nel3vpnapi.l3vpninstances.L3VpnInstance;
@@ -116,8 +128,11 @@ public class L3vpnNeManager implements L3vpnNeService {
     private static final String EDIT_OPERATION_DELETE = "delete";
     private static final String OK = "ok";
 
-    private EventuallyConsistentMap<String, L3VpnInstances> l3VpnInstancesStore;
-    private EventuallyConsistentMap<String, Bgpcomm> bgpcommStore;
+    private EventuallyConsistentMap<DeviceId, L3VpnInstances> l3VpnInstancesStore;
+    private EventuallyConsistentMap<DeviceId, Bgpcomm> bgpcommStore;
+
+    private static final String L3VPNINSTANCESTORE = "l3vpn-instances-store";
+    private static final String BGPCOMMSTORE = "bgp-comm-store";
 
     @Activate
     public void activate() {
@@ -126,11 +141,25 @@ public class L3vpnNeManager implements L3vpnNeService {
                 .register(KryoNamespaces.API).register(L3VpnInstancesImpl.class)
                 .register(L3VpnIfImpl.class).register(Ipv4Address.class)
                 .register(L3VpncommonL3VpnPrefixType.class)
+                .register(L3VpncommonL3VpnPrefixTypeEnum.class)
                 .register(VpnTargetImpl.class)
-                .register(L3VpncommonVrfRtType.class);
+                .register(L3VpncommonVrfRtType.class)
+                .register(BgpcommImpl.class).register(BgpVrfsImpl.class)
+                .register(BgpVrfImpl.class).register(BgpVrfAfsImpl.class)
+                .register(BgpVrfAfImpl.class).register(BgpcommPrefixType.class)
+                .register(BgpcommPrefixTypeEnum.class)
+                .register(ImportRoutesImpl.class)
+                .register(ImportRouteImpl.class)
+                .register(BgpcommImRouteProtocol.class)
+                .register(BgpcommImRouteProtocolEnum.class);
         l3VpnInstancesStore = storageService
-                .<String, L3VpnInstances>eventuallyConsistentMapBuilder()
-                .withName("").withSerializer(serializer)
+                .<DeviceId, L3VpnInstances>eventuallyConsistentMapBuilder()
+                .withName(L3VPNINSTANCESTORE).withSerializer(serializer)
+                .withTimestampProvider((k, v) -> clockService.getTimestamp())
+                .build();
+        bgpcommStore = storageService
+                .<DeviceId, Bgpcomm>eventuallyConsistentMapBuilder()
+                .withName(BGPCOMMSTORE).withSerializer(serializer)
                 .withTimestampProvider((k, v) -> clockService.getTimestamp())
                 .build();
         log.info("Started");
@@ -138,6 +167,8 @@ public class L3vpnNeManager implements L3vpnNeService {
 
     @Deactivate
     public void deactivate() {
+        l3VpnInstancesStore.clear();
+        bgpcommStore.clear();
         log.info("Stopped");
     }
 
@@ -188,6 +219,7 @@ public class L3vpnNeManager implements L3vpnNeService {
                               Map<VrfEntity, HashSet<VpnAc>> vpnAcForVrfMap) {
         L3VpnInstances l3VpnInstances = DataConvertUtil
                 .convertToL3vpnInstances(vpnAcForVrfMap);
+        l3VpnInstancesStore.put(deviceId, l3VpnInstances);
         String contentVersion = CONTENT_VERSION;
         String formatVersion = FORMAT_VERSION;
         List<NetconfL3vpnInstance> netconfInstanceList = new ArrayList<NetconfL3vpnInstance>();
@@ -251,6 +283,7 @@ public class L3vpnNeManager implements L3vpnNeService {
     private boolean createBgpImportProtocol(DeviceId deviceId,
                                             VpnInstance vpnInstance) {
         Bgpcomm bgpcomm = DataConvertUtil.convertToBgpComm(vpnInstance);
+        bgpcommStore.put(deviceId, bgpcomm);
         String contentVersion = CONTENT_VERSION;
         String formatVersion = FORMAT_VERSION;
         List<NetconfBgpVrf> netconfBgpvrfList = new ArrayList<NetconfBgpVrf>();

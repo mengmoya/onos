@@ -64,6 +64,34 @@ public class VrfEntity {
     }
 
     /**
+     * VrfEntity constructor.
+     *
+     * @param vrfName vrf name
+     * @param routeDistinguisher route distinguisher
+     * @param importTargets list of importTarget
+     * @param exportTargets list of exportTarget
+     * @param acIdList list of access identifier
+     * @param bgp bgp
+     */
+    public VrfEntity(String vrfName, String routeDistinguisher,
+                     List<String> importTargets, List<String> exportTargets,
+                     List<String> acIdList, Bgp bgp) {
+        checkNotNull(vrfName, "vrfName cannot be null");
+        checkNotNull(routeDistinguisher, "routeDistinguisher cannot be null");
+        checkNotNull(importTargets, "importTargets cannot be null");
+        checkNotNull(exportTargets, "exportTargets cannot be null");
+        checkNotNull(acIdList, "acIdList cannot be null");
+        checkNotNull(bgp, "bgp cannot be null");
+        this.vrfName = vrfName;
+        this.netVpnId = null;
+        this.routeDistinguisher = routeDistinguisher;
+        this.importTargets = importTargets;
+        this.exportTargets = exportTargets;
+        this.acIdList = acIdList;
+        this.bgp = bgp;
+    }
+
+    /**
      * Returns vrfName.
      *
      * @return vrfName
