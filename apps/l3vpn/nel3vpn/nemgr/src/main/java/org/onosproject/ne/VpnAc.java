@@ -33,8 +33,11 @@ public final class VpnAc {
     /**
      * VpnAc constructor.
      *
-     * @param columnName the column name
-     * @param obj the data of the column
+     * @param netVpnId network vpn instance identifier
+     * @param acId ac identifier
+     * @param acName ac name
+     * @param ipAddress ip address
+     * @param subNetMask mask
      */
     public VpnAc(String netVpnId, String acId, String acName, String ipAddress,
                  Integer subNetMask) {
@@ -44,6 +47,27 @@ public final class VpnAc {
         checkNotNull(ipAddress, "ipAddress cannot be null");
         checkNotNull(subNetMask, "subNetMask cannot be null");
         this.netVpnId = netVpnId;
+        this.acId = acId;
+        this.acName = acName;
+        this.ipAddress = ipAddress;
+        this.subNetMask = subNetMask;
+    }
+
+    /**
+     * VpnAc constructor.
+     *
+     * @param acId ac identifier
+     * @param acName ac name
+     * @param ipAddress ip address
+     * @param subNetMask mask
+     */
+    public VpnAc(String acId, String acName, String ipAddress,
+                 Integer subNetMask) {
+        checkNotNull(acId, "acId cannot be null");
+        checkNotNull(acName, "acName cannot be null");
+        checkNotNull(ipAddress, "ipAddress cannot be null");
+        checkNotNull(subNetMask, "subNetMask cannot be null");
+        this.netVpnId = null;
         this.acId = acId;
         this.acName = acName;
         this.ipAddress = ipAddress;
