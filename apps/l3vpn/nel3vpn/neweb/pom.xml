@@ -26,16 +26,11 @@
 
     <artifactId>onos-app-l3vpn-ne-web</artifactId>
     <packaging>bundle</packaging>
-
-    <description>l3vpn network element web application</description>
-
     <properties>
-        <onos.app.name>org.onosproject.nel3vpnweb</onos.app.name>
-        <onos.app.title>web application</onos.app.title>
-        <onos.app.category>Utility</onos.app.category>
-        <onos.app.url>https://wiki.onosproject.org/display/ONOS/</onos.app.url>
         <web.context>/onos/nel3vpn</web.context>
     </properties>
+
+    <description>l3vpn network element web application</description>
 
     <dependencies>
         <dependency>
@@ -48,6 +43,34 @@
             <artifactId>onos-app-l3vpn-ne-mgr</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.onosproject</groupId>
+            <artifactId>onos-rest</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <_wab>src/main/webapp/</_wab>
+                        <Bundle-SymbolicName>
+                            ${project.groupId}.${project.artifactId}
+                        </Bundle-SymbolicName>
+                        <Import-Package>
+                            *,org.glassfish.jersey.servlet
+                        </Import-Package>
+                        <Web-ContextPath>${web.context}</Web-ContextPath>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

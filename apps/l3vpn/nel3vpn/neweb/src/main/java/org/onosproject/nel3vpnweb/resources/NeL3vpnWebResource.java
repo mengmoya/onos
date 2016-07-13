@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * REST resource for l3vpn network element.
  */
-@Path("nel3vpn")
+@Path("ne")
 public class NeL3vpnWebResource extends AbstractWebResource {
     public static final String NE_NOT_FOUND = "Network element is not found";
     public static final String CREATE_FAIL = "Create l3vpn failed";
