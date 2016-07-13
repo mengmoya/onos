@@ -42,13 +42,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Path("instance")
-public class L3vpnWebResource extends AbstractWebResource {
+public class NetL3vpnWebResource extends AbstractWebResource {
     public static final String INSTANCE_NOT_FOUND = "Instance is not found";
     public static final String INSTANCE_ID_EXIST = "Instance id is exist";
     public static final String INSTANCE_ID_NOT_EXIST = "Instance id is not exist";
     public static final String JSON_NOT_NULL = "JsonNode can not be null";
     protected static final Logger log = LoggerFactory
-            .getLogger(L3vpnWebResource.class);
+            .getLogger(NetL3vpnWebResource.class);
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
