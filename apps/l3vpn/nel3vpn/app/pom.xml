@@ -27,7 +27,7 @@
     <artifactId>onos-app-nel3vpn</artifactId>
     <packaging>pom</packaging>
 
-    <description>ONOS framework applications</description>
+    <description>l3vpn network element applications</description>
 
     <dependencies>
         <dependency>
