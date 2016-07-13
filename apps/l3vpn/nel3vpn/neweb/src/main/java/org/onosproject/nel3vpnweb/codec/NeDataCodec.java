@@ -80,7 +80,7 @@ public final class NeDataCodec extends JsonCodec<NeData> {
                 for (JsonNode acid : vrf.get("acids")) {
                     acids.add(acid.asText());
                 }
-                JsonNode importprotocols = instance.get("bgp")
+                JsonNode importprotocols = vrf.get("bgp")
                         .get("importprotocols");
                 List<BgpImportProtocol> importProtocols = new ArrayList<BgpImportProtocol>();
                 for (JsonNode importprotocol : importprotocols) {
