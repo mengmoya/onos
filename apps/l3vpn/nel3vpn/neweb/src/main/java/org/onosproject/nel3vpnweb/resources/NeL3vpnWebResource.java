@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import org.onlab.util.ItemNotFoundException;
 import org.onosproject.ne.NeData;
 import org.onosproject.ne.manager.L3vpnNeService;
-import org.onosproject.nel3vpnweb.codec.NeDataCodec;
 import org.onosproject.rest.AbstractWebResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +53,7 @@ public class NeL3vpnWebResource extends AbstractWebResource {
     public Response createL3vpn(InputStream input) {
         try {
             JsonNode cfg = this.mapper().readTree(input);
-            NeData nedata = new NeDataCodec().decode((ObjectNode) cfg, this);
+            NeData nedata = codec(NeData.class).decode((ObjectNode) cfg, this);
             Boolean issuccess = nullIsNotFound(get(L3vpnNeService.class)
                     .createL3vpn(nedata), NE_NOT_FOUND);
             if (!issuccess) {
