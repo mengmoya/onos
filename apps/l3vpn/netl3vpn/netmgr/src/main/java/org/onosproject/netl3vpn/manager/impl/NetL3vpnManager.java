@@ -124,11 +124,11 @@ public class NetL3vpnManager implements NetL3vpnService {
                       instance.id());
             return false;
         }
-        webNetL3vpnStore.put(webNetL3vpnInstance.getId(), webNetL3vpnInstance);
         if (!checkOccupiedResource()) {
             log.debug("The resource of l3vpn instance is occupied.");
             return false;
         }
+        webNetL3vpnStore.put(webNetL3vpnInstance.getId(), webNetL3vpnInstance);
         l3VpnAllocateRes = applyResource();
         if (l3VpnAllocateRes == null) {
             log.debug("Apply resources of l3vpn instance failed.");
@@ -165,7 +165,7 @@ public class NetL3vpnManager implements NetL3vpnService {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     public boolean checkOccupiedResource() {
