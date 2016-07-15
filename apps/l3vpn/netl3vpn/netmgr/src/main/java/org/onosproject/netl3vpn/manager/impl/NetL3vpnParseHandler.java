@@ -15,8 +15,6 @@
  */
 package org.onosproject.netl3vpn.manager.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +27,28 @@ import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.Inst
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.instance.nes.Ne;
 
 /**
- * Provides implementation of ClassifierService.
+ * Net l3 vpn parse configuration handler.
  */
-public class NetL3vpnParse {
-    private static final String INSTANCE_NOT_NULL = "Instance can not be null";
-
+public final class NetL3vpnParseHandler {
+    private static NetL3vpnParseHandler netL3vpnParseHandler = null;
     private Instance instance;
 
-    public NetL3vpnParse(Instance instance) {
-        checkNotNull(instance, INSTANCE_NOT_NULL);
+    private NetL3vpnParseHandler() {
+    }
+
+    /**
+     * Returns single instance of this class.
+     *
+     * @return this class single instance
+     */
+    public static NetL3vpnParseHandler getInstance() {
+        if (netL3vpnParseHandler == null) {
+            netL3vpnParseHandler = new NetL3vpnParseHandler();
+        }
+        return netL3vpnParseHandler;
+    }
+
+    public void initialize(Instance instance) {
         this.instance = instance;
     }
 
