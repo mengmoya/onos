@@ -1,4 +1,4 @@
-package org.onosproject.l3vpnweb.resources;
+package org.onosproject.netl3vpnweb.resources;
 
 import java.util.Set;
 
