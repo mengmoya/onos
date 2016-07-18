@@ -97,7 +97,6 @@ public class NetL3vpnManager implements NetL3vpnService {
                                         labelRsrcService);
 
         netL3vpnDecompHandler = NetL3vpnDecompHandler.getInstance();
-        netL3vpnDecompHandler.initialize(l3VpnAllocateRes, deviceService);
 
         KryoNamespace.Builder serializer = KryoNamespace.newBuilder()
                 .register(KryoNamespaces.API).register(VpnInstance.class)
@@ -154,6 +153,7 @@ public class NetL3vpnManager implements NetL3vpnService {
             log.debug("Apply resources of l3vpn instance failed.");
             return false;
         }
+        netL3vpnDecompHandler.initialize(l3VpnAllocateRes, deviceService);
         NeData neData = netL3vpnDecompHandler.decompNeData(webNetL3vpnInstance);
         for (VpnInstance vpnInstance : neData.vpnInstanceList()) {
             vpnInstanceStore.put(vpnInstance.neId(), vpnInstance);

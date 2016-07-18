@@ -12,6 +12,7 @@ import org.onosproject.ne.NeData;
 import org.onosproject.ne.VpnAc;
 import org.onosproject.ne.VpnInstance;
 import org.onosproject.ne.VrfEntity;
+import org.onosproject.net.AnnotationKeys;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.Port;
 import org.onosproject.net.PortNumber;
@@ -114,7 +115,8 @@ public final class NetL3vpnDecompHandler {
                         .getPort(DeviceId.deviceId(neId),
                                  PortNumber.portNumber(webAc.getL2Access()
                                          .getPort().getLtpId()));
-                String acName = port.number().name();
+                String acName = port.annotations()
+                        .value(AnnotationKeys.PORT_NAME);
                 String ipAddress = webAc.getL3Access().getAddress();
                 int subNetMask = Integer.parseInt(webAc.getL3Access()
                         .getAddress().split("/")[1]);

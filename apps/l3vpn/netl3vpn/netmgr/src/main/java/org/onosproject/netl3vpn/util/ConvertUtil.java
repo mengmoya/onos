@@ -34,25 +34,25 @@ public final class ConvertUtil {
     }
 
     /**
-     * Hanle the enum value to specific format.
+     * Hanle the String value to specific format.
      *
-     * @param enumValue enum value
+     * @param strValue String value
      * @return converted value
      */
-    public static String handleEnumValue(String enumValue) {
+    public static String handleStringValue(String strValue) {
         StringBuffer strBuf = new StringBuffer();
-        if (enumValue != null && !enumValue.equals("")) {
-            if (enumValue.contains("-")) {
-                String[] enumValues = enumValue.split("-");
+        if (strValue != null && !strValue.equals("")) {
+            if (strValue.contains("-")) {
+                String[] enumValues = strValue.split("-");
                 for (String str : enumValues) {
                     char ch = str.charAt(0);
                     strBuf.append(Character.toUpperCase(ch));
                     strBuf.append(str.subSequence(1, str.length()));
                 }
             } else {
-                char ch = enumValue.charAt(0);
+                char ch = strValue.charAt(0);
                 strBuf.append(Character.toUpperCase(ch));
-                strBuf.append(enumValue.subSequence(1, enumValue.length()));
+                strBuf.append(strValue.subSequence(1, strValue.length()));
             }
             return strBuf.toString();
         }
@@ -79,7 +79,7 @@ public final class ConvertUtil {
      */
     public static WebL2Access convertToWebL2Access(L2Access l2Access) {
         return new WebL2Access(L2AccessType
-                .valueOf(handleEnumValue(l2Access.accessType())),
+                .valueOf(handleStringValue(l2Access.accessType())),
                                convertToWebPort(l2Access.port()));
     }
 
@@ -90,7 +90,7 @@ public final class ConvertUtil {
      * @return WebPort
      */
     public static WebPort convertToWebPort(Port port) {
-        return new WebPort(port.ltpId());
+        return new WebPort(handleStringValue(port.ltpId()));
     }
 
     /**
