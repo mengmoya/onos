@@ -211,6 +211,7 @@ public final class DataConvertUtil {
                 default:
                     break;
                 }
+                importRouteBuilder.importProcessId(importPro.processId());
                 importRouteList.add(importRouteBuilder.build());
             }
             importRoutesBuilder.importRoute(importRouteList);

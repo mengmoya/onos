@@ -18,6 +18,7 @@ package org.onosproject.drivers.huawei.util;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.onosproject.drivers.huawei.HuaWeiL3vpnConfig.FilterType;
 import org.onosproject.drivers.huawei.HuaWeiL3vpnConfig.NetconfConfigDatastoreType;
 import org.onosproject.net.behaviour.NetconfBgp;
@@ -51,7 +52,6 @@ public final class DocumentConvertUtil {
      * Convert To l3vpn Document.
      *
      * @param rpcXmlns rpc element attribute xmlns
-     * @param messageId message identifier
      * @param datastoreType Netconf Config Datastore Type
      * @param errorOperation error operation
      * @param configXmlns l3vpn element attribute xmlns
@@ -59,20 +59,19 @@ public final class DocumentConvertUtil {
      * @return Document
      */
     public static Document convertEditL3vpnDocument(String rpcXmlns,
-                                                    String messageId,
                                                     NetconfConfigDatastoreType datastoreType,
                                                     String errorOperation,
                                                     String configXmlns,
                                                     NetconfL3vpn netconfL3vpn) {
-        Document rpcDoc = convertRpcDocument(rpcXmlns, messageId);
+        Document rpcDoc = convertRpcDocument(rpcXmlns);
         Document editDoc = convertEditConfigDocument(datastoreType,
                                                      errorOperation);
         Document l3vpnDoc = DocumentHelper.createDocument();
         Element l3vpn = l3vpnDoc.addElement("l3vpn");
-        l3vpn.addAttribute("xmlns", configXmlns);
+        l3vpn.add(Namespace.get(configXmlns));
         l3vpn.addAttribute("content-version", netconfL3vpn.contentVersion());
         l3vpn.addAttribute("format-version", netconfL3vpn.formatVersion());
-        Element l3vpncommon = l3vpn.addElement("l3vpncommon");
+        Element l3vpncommon = l3vpn.addElement("l3vpncomm");
         Element l3vpnInstances = l3vpncommon.addElement("l3vpnInstances");
         for (NetconfL3vpnInstance netconfL3vpnInstance : netconfL3vpn
                 .l3vpnComm().l3vpninstances().l3vpninstances()) {
@@ -88,7 +87,7 @@ public final class DocumentConvertUtil {
                 vpnInstAF.addElement("afType")
                         .setText(netconfVpnInstAF.afType());
                 vpnInstAF.addElement("vrfRD").setText(netconfVpnInstAF.vrfRD());
-                Element vpnTargets = vpnInstAFs.addElement("vpnTargets");
+                Element vpnTargets = vpnInstAF.addElement("vpnTargets");
                 for (NetconfVpnTarget netconfVpnTarget : netconfVpnInstAF
                         .vpnTargets().vpnTargets()) {
                     Element vpnTarget = vpnTargets.addElement("vpnTarget");
@@ -112,7 +111,7 @@ public final class DocumentConvertUtil {
         }
         editDoc.getRootElement().element("config")
                 .add(l3vpnDoc.getRootElement());
-        rpcDoc.getRootElement().add(editDoc);
+        rpcDoc.getRootElement().add(editDoc.getRootElement());
         return rpcDoc;
     }
 
@@ -120,7 +119,6 @@ public final class DocumentConvertUtil {
      * Convert To bgp Document.
      *
      * @param rpcXmlns rpc element attribute xmlns
-     * @param messageId message identifier
      * @param datastoreType Netconf Config Datastore Type
      * @param errorOperation error operation
      * @param configXmlns l3vpn element attribute xmlns
@@ -128,20 +126,19 @@ public final class DocumentConvertUtil {
      * @return Document
      */
     public static Document convertEditBgpDocument(String rpcXmlns,
-                                                  String messageId,
                                                   NetconfConfigDatastoreType datastoreType,
                                                   String errorOperation,
                                                   String configXmlns,
                                                   NetconfBgp netconfBgp) {
-        Document rpcDoc = convertRpcDocument(rpcXmlns, messageId);
+        Document rpcDoc = convertRpcDocument(rpcXmlns);
         Document editDoc = convertEditConfigDocument(datastoreType,
                                                      errorOperation);
-        Document bgpnDoc = DocumentHelper.createDocument();
-        Element bgp = bgpnDoc.addElement("bgp");
-        bgp.addAttribute("xmlns", configXmlns);
+        Document bgpDoc = DocumentHelper.createDocument();
+        Element bgp = bgpDoc.addElement("bgp");
+        bgp.add(Namespace.get(configXmlns));
         bgp.addAttribute("content-version", netconfBgp.contentVersion());
         bgp.addAttribute("format-version", netconfBgp.formatVersion());
-        Element bgpcommon = bgp.addElement("bgpcommon");
+        Element bgpcommon = bgp.addElement("bgpcomm");
         Element bgpVrfs = bgpcommon.addElement("bgpVrfs");
         for (NetconfBgpVrf netconfBgpVrf : netconfBgp.bgpcomm().bgpVrfs()
                 .bgpVrfs()) {
@@ -162,12 +159,13 @@ public final class DocumentConvertUtil {
                                              netconfImportRoute.operation());
                     importRoute.addElement("importProtocol")
                             .setText(netconfImportRoute.importProtocol());
+                    importRoute.addElement("importProcessId")
+                            .setText(netconfImportRoute.importProcessId());
                 }
             }
         }
-        editDoc.getRootElement().element("config")
-                .add(bgpnDoc.getRootElement());
-        rpcDoc.getRootElement().add(editDoc);
+        editDoc.getRootElement().element("config").add(bgpDoc.getRootElement());
+        rpcDoc.getRootElement().add(editDoc.getRootElement());
         return rpcDoc;
     }
 
@@ -175,14 +173,12 @@ public final class DocumentConvertUtil {
      * Convert To Rpc Document.
      *
      * @param xmlns xmlns
-     * @param messageId message identifier
      * @return Document
      */
-    public static Document convertRpcDocument(String xmlns, String messageId) {
+    public static Document convertRpcDocument(String xmlns) {
         Document doc = DocumentHelper.createDocument();
         Element rpc = doc.addElement("rpc");
-        rpc.addAttribute("xmlns", xmlns);
-        rpc.addAttribute("message-id", messageId);
+        rpc.add(Namespace.get(xmlns));
         return doc;
     }
 
@@ -213,7 +209,7 @@ public final class DocumentConvertUtil {
         Element editConfig = doc.addElement("edit-config");
         Element target = editConfig.addElement("target");
         target.addElement(type.name().toLowerCase());
-        Element operation = editConfig.addElement("error-operation");
+        Element operation = editConfig.addElement("error-option");
         operation.setText(errorOperation);
         editConfig.addElement("config");
         return doc;

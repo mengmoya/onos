@@ -80,26 +80,32 @@ public final class NeDataCodec extends JsonCodec<NeData> {
                 for (JsonNode acid : vrf.get("acids")) {
                     acids.add(acid.asText());
                 }
-                JsonNode importprotocols = vrf.get("bgp")
-                        .get("importprotocols");
+                JsonNode importroutes = vrf.get("bgp").get("importroutes");
                 List<BgpImportProtocol> importProtocols = new ArrayList<BgpImportProtocol>();
-                for (JsonNode importprotocol : importprotocols) {
-                    switch (importprotocol.asText().toUpperCase()) {
+                for (JsonNode importroute : importroutes) {
+                    String processId = importroute.get("importprocessid")
+                            .asText();
+                    switch (importroute.get("importprotocol").asText()
+                            .toLowerCase()) {
                     case DIRECT:
                         importProtocols
-                                .add(new BgpImportProtocol(ProtocolType.DIRECT));
+                                .add(new BgpImportProtocol(ProtocolType.DIRECT,
+                                                           processId));
                         break;
                     case BGP:
                         importProtocols
-                                .add(new BgpImportProtocol(ProtocolType.BGP));
+                                .add(new BgpImportProtocol(ProtocolType.BGP,
+                                                           processId));
                         break;
                     case ISIS:
                         importProtocols
-                                .add(new BgpImportProtocol(ProtocolType.ISIS));
+                                .add(new BgpImportProtocol(ProtocolType.ISIS,
+                                                           processId));
                         break;
                     case OSPF:
                         importProtocols
-                                .add(new BgpImportProtocol(ProtocolType.OSPF));
+                                .add(new BgpImportProtocol(ProtocolType.OSPF,
+                                                           processId));
                         break;
                     default:
                         break;
