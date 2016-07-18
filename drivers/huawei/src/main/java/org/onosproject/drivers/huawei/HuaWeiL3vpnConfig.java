@@ -16,8 +16,7 @@
 package org.onosproject.drivers.huawei;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.UUID;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.dom4j.Document;
 import org.onosproject.drivers.huawei.util.DocumentConvertUtil;
@@ -29,16 +28,18 @@ import org.onosproject.net.driver.AbstractHandlerBehaviour;
 import org.onosproject.netconf.NetconfController;
 import org.onosproject.netconf.NetconfException;
 import org.onosproject.netconf.NetconfSession;
+import org.slf4j.Logger;
 
 /**
  * Configures l3vpn on HuaWei devices.
  */
 public class HuaWeiL3vpnConfig extends AbstractHandlerBehaviour
         implements L3vpnConfig {
-
+    private final Logger log = getLogger(getClass());
     private static final String RPC_XMLNS = "urn:ietf:params:xml:ns:netconf:base:1.0";
     private static final String CONFIG_XMLNS = "http://www.huawei.com/netconf/vrp";
     private static final String ERROR_OPERATION = "rollback-on-error";
+    private static final String DEFAULT_NAMESPACE = " xmlns=\"\"";
 
     @Override
     public boolean createVrf(DeviceId deviceId, NetconfL3vpn netconfL3vpn) {
@@ -48,13 +49,13 @@ public class HuaWeiL3vpnConfig extends AbstractHandlerBehaviour
                 .getSession();
         Document l3vpnDocument = DocumentConvertUtil
                 .convertEditL3vpnDocument(RPC_XMLNS,
-                                          UUID.randomUUID().toString(),
                                           NetconfConfigDatastoreType.RUNNING,
                                           ERROR_OPERATION, CONFIG_XMLNS,
                                           netconfL3vpn);
+        String requestMessage = l3vpnDocument.asXML().replaceAll(DEFAULT_NAMESPACE, "");
         boolean reply;
         try {
-            reply = session.editConfig(l3vpnDocument.asXML());
+            reply = session.editConfig(requestMessage);
         } catch (NetconfException e) {
             throw new RuntimeException(new NetconfException("Failed to create virtual routing forwarding.",
                                                             e));
@@ -70,20 +71,20 @@ public class HuaWeiL3vpnConfig extends AbstractHandlerBehaviour
         NetconfSession session = controller.getDevicesMap().get(deviceId)
                 .getSession();
         Document bgpDocument = DocumentConvertUtil
-                .convertEditBgpDocument(RPC_XMLNS, UUID.randomUUID().toString(),
+                .convertEditBgpDocument(RPC_XMLNS,
                                         NetconfConfigDatastoreType.RUNNING,
                                         ERROR_OPERATION, CONFIG_XMLNS,
                                         netconfBgp);
+        String requestMessage = bgpDocument.asXML().replaceAll(DEFAULT_NAMESPACE, "");
         boolean reply;
         try {
-            reply = session.editConfig(bgpDocument.asXML());
+            reply = session.editConfig(requestMessage);
         } catch (NetconfException e) {
             throw new RuntimeException(new NetconfException("Failed to create bgp import protocol.",
                                                             e));
         }
         return reply;
     }
-
 
     /**
      * The enumeration of Netconf Config Datastore type.

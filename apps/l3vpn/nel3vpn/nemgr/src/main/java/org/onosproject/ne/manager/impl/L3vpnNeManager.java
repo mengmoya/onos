@@ -229,7 +229,7 @@ public class L3vpnNeManager implements L3vpnNeService {
             // NetconfVpnInstAFs
             List<NetconfVpnInstAF> netconfAFList = new ArrayList<NetconfVpnInstAF>();
             for (VpnInstAf vpnInstAf : l3VpnInstance.vpnInstAfs().vpnInstAf()) {
-                String afType = vpnInstAf.afType().toString()
+                String afType = vpnInstAf.afType().enumeration().name()
                         .replaceAll("_", "").toLowerCase();
                 String vrfRD = vpnInstAf.vrfRd();
                 List<NetconfVpnTarget> netconfTargetList = new ArrayList<NetconfVpnTarget>();
@@ -300,8 +300,10 @@ public class L3vpnNeManager implements L3vpnNeService {
                     String importRouteOperation = EDIT_OPERATION_CREATE;
                     String importProtocol = importRoute.importProtocol()
                             .enumeration().name().toLowerCase();
+                    String importProcessId = importRoute.importProcessId();
                     NetconfImportRoute netconfImportRoute = new NetconfImportRoute(importRouteOperation,
-                                                                                   importProtocol);
+                                                                                   importProtocol,
+                                                                                   importProcessId);
                     netconfImportRouteList.add(netconfImportRoute);
                 }
                 NetconfImportRoutes netconfImportRoutes = new NetconfImportRoutes(netconfImportRouteList);

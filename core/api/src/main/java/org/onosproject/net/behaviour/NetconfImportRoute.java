@@ -26,18 +26,23 @@ import java.util.Objects;
 public class NetconfImportRoute {
     private final String operation;
     private final String importProtocol;
+    private final String importProcessId;
 
     /**
      * NetconfImportRoute constructor.
      *
      * @param operation operation
      * @param importProtocol import protocol
+     * @param importProcessId import process identifier
      */
-    public NetconfImportRoute(String operation, String importProtocol) {
+    public NetconfImportRoute(String operation, String importProtocol,
+                              String importProcessId) {
         checkNotNull(operation, "operation cannot be null");
         checkNotNull(importProtocol, "importProtocol cannot be null");
+        checkNotNull(importProcessId, "importProcessId cannot be null");
         this.operation = operation;
         this.importProtocol = importProtocol;
+        this.importProcessId = importProcessId;
     }
 
     /**
@@ -58,9 +63,18 @@ public class NetconfImportRoute {
         return importProtocol;
     }
 
+    /**
+     * Returns importProcessId.
+     *
+     * @return importProcessId
+     */
+    public String importProcessId() {
+        return importProcessId;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(operation, importProtocol);
+        return Objects.hash(operation, importProtocol, importProcessId);
     }
 
     @Override
@@ -70,8 +84,10 @@ public class NetconfImportRoute {
         }
         if (obj instanceof NetconfImportRoute) {
             final NetconfImportRoute other = (NetconfImportRoute) obj;
-            return Objects.equals(this.operation, other.operation) && Objects
-                    .equals(this.importProtocol, other.importProtocol);
+            return Objects.equals(this.operation, other.operation)
+                    && Objects.equals(this.importProtocol, other.importProtocol)
+                    && Objects.equals(this.importProcessId,
+                                      other.importProcessId);
         }
         return false;
     }
@@ -79,6 +95,7 @@ public class NetconfImportRoute {
     @Override
     public String toString() {
         return toStringHelper(this).add("operation", operation)
-                .add("importProtocol", importProtocol).toString();
+                .add("importProtocol", importProtocol)
+                .add("importProcessId", importProcessId).toString();
     }
 }

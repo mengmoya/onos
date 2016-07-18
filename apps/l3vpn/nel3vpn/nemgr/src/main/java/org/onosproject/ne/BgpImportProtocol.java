@@ -25,15 +25,19 @@ import java.util.Objects;
  */
 public final class BgpImportProtocol {
     private final ProtocolType protocolType;
+    private final String processId;
 
     /**
      * BgpImportProtocol constructor.
      *
      * @param protocolType the bgp protocol type
+     * @param processId import process identifier
      */
-    public BgpImportProtocol(ProtocolType protocolType) {
+    public BgpImportProtocol(ProtocolType protocolType, String processId) {
         checkNotNull(protocolType, "protocolType cannot be null");
+        checkNotNull(processId, "processId cannot be null");
         this.protocolType = protocolType;
+        this.processId = processId;
     }
 
     /**
@@ -43,6 +47,15 @@ public final class BgpImportProtocol {
      */
     public ProtocolType protocolType() {
         return protocolType;
+    }
+
+    /**
+     * Returns processId.
+     *
+     * @return processId
+     */
+    public String processId() {
+        return processId;
     }
 
     /**
@@ -67,7 +80,7 @@ public final class BgpImportProtocol {
 
     @Override
     public int hashCode() {
-        return Objects.hash(protocolType);
+        return Objects.hash(protocolType, processId);
     }
 
     @Override
@@ -77,13 +90,15 @@ public final class BgpImportProtocol {
         }
         if (obj instanceof BgpImportProtocol) {
             final BgpImportProtocol other = (BgpImportProtocol) obj;
-            return Objects.equals(this.protocolType, other.protocolType);
+            return Objects.equals(this.protocolType, other.protocolType)
+                    && Objects.equals(this.processId, other.processId);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return toStringHelper(this).add("protocolType", protocolType).toString();
+        return toStringHelper(this).add("protocolType", protocolType)
+                .add("processId", processId).toString();
     }
 }
