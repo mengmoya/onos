@@ -1,5 +1,7 @@
 package org.onosproject.netl3vpn.manager.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -12,25 +14,60 @@ import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetL3vpnLabelResource {
+/**
+ * Net l3 vpn label resource handler.
+ */
+public final class NetL3vpnLabelHandler {
     private static final Logger log = LoggerFactory
-            .getLogger(NetL3vpnLabelResource.class);
+            .getLogger(NetL3vpnLabelHandler.class);
     private static final String RD_PREFIX = "100:";
     private static final String RT_PREFIX = "100:";
     private static final String VRF_PREFIX = "VRF_";
+    private static final String LABEL_RESOURCE_ADMIN_SERVICE_NULL = "Label Resource Admin Service cannot be null";
+    private static NetL3vpnLabelHandler netL3vpnLabelHandler = null;
     private LabelResourceAdminService labelRsrcAdminService;
     private LabelResourceService labelRsrcService;
-    private WebNetL3vpnInstance webNetL3vpnInstance;
 
-    public NetL3vpnLabelResource(LabelResourceAdminService labelRsrcAdminService,
-                                 LabelResourceService labelRsrcService,
-                                 WebNetL3vpnInstance webNetL3vpnInstance) {
-        this.labelRsrcAdminService = labelRsrcAdminService;
-        this.labelRsrcService = labelRsrcService;
-        this.webNetL3vpnInstance = webNetL3vpnInstance;
+    /**
+     * Initializes default values.
+     */
+    private NetL3vpnLabelHandler() {
     }
 
-    public String allocateResource(String allocateType) {
+    /**
+     * Returns single instance of this class.
+     *
+     * @return this class single instance
+     */
+    public static NetL3vpnLabelHandler getInstance() {
+        if (netL3vpnLabelHandler == null) {
+            netL3vpnLabelHandler = new NetL3vpnLabelHandler();
+        }
+        return netL3vpnLabelHandler;
+    }
+
+    public void initialize(LabelResourceAdminService labelRsrcAdminService,
+                           LabelResourceService labelRsrcService) {
+        this.labelRsrcAdminService = labelRsrcAdminService;
+        this.labelRsrcService = labelRsrcService;
+    }
+
+    /**
+     * Reserves the global label pool.
+     *
+     * @param beginLabel minimum value of global label space
+     * @param endLabel maximum value of global label space
+     * @return success or failure
+     */
+    public boolean reserveGlobalPool(long beginLabel, long endLabel) {
+        checkNotNull(labelRsrcAdminService, LABEL_RESOURCE_ADMIN_SERVICE_NULL);
+        return labelRsrcAdminService
+                .createGlobalPool(LabelResourceId.labelResourceId(beginLabel),
+                                  LabelResourceId.labelResourceId(endLabel));
+    }
+
+    public String allocateResource(String allocateType,
+                                   WebNetL3vpnInstance webNetL3vpnInstance) {
         long applyNum = 1; // For each vpn only one rd label
         LabelResourceId specificLabelId = null;
         Collection<LabelResource> result = labelRsrcService
@@ -51,7 +88,6 @@ public class NetL3vpnLabelResource {
                       allocateType, webNetL3vpnInstance.getId());
             return null;
         }
-
         switch (allocateType) {
         case "rd":
             return RD_PREFIX + specificLabelId.id();

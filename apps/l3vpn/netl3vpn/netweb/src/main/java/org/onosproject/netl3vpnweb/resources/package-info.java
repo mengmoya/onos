@@ -17,4 +17,4 @@
 /**
  * Package for l3vpn network web resources.
  */
-package org.onosproject.l3vpnweb.resources;
+package org.onosproject.netl3vpnweb.resources;

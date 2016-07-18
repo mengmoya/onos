@@ -12,6 +12,7 @@ import org.onosproject.ne.NeData;
 import org.onosproject.ne.VpnAc;
 import org.onosproject.ne.VpnInstance;
 import org.onosproject.ne.VrfEntity;
+import org.onosproject.net.AnnotationKeys;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.Port;
 import org.onosproject.net.PortNumber;
@@ -20,20 +21,33 @@ import org.onosproject.netl3vpn.entity.NetL3VpnAllocateRes;
 import org.onosproject.netl3vpn.entity.WebAc;
 import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 
-public class NetL3vpnDecomp {
-    private WebNetL3vpnInstance webNetL3vpnInstance;
+public final class NetL3vpnDecompHandler {
+    private static NetL3vpnDecompHandler netL3vpnDecompHandler = null;
     private NetL3VpnAllocateRes l3VpnAllocateRes;
     private DeviceService deviceService;
 
-    public NetL3vpnDecomp(WebNetL3vpnInstance webNetL3vpnInstance,
-                          NetL3VpnAllocateRes l3VpnAllocateRes,
-                          DeviceService deviceService) {
-        this.webNetL3vpnInstance = webNetL3vpnInstance;
+    private NetL3vpnDecompHandler() {
+    }
+
+    /**
+     * Returns single instance of this class.
+     *
+     * @return this class single instance
+     */
+    public static NetL3vpnDecompHandler getInstance() {
+        if (netL3vpnDecompHandler == null) {
+            netL3vpnDecompHandler = new NetL3vpnDecompHandler();
+        }
+        return netL3vpnDecompHandler;
+    }
+
+    public void initialize(NetL3VpnAllocateRes l3VpnAllocateRes,
+                           DeviceService deviceService) {
         this.l3VpnAllocateRes = l3VpnAllocateRes;
         this.deviceService = deviceService;
     }
 
-    public NeData decompNeData() {
+    public NeData decompNeData(WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnInstance> vpnInstanceList = new ArrayList<VpnInstance>();
         List<VpnAc> vpnAcList = new ArrayList<VpnAc>();
 
@@ -55,12 +69,13 @@ public class NetL3vpnDecomp {
             acsByNeMap.put(neId, acsByNeList);
         }
 
-        vpnInstanceList = decompVpnInstance(acIdsByNeMap);
-        vpnAcList = decompVpnAc(acsByNeMap);
+        vpnInstanceList = decompVpnInstance(acIdsByNeMap, webNetL3vpnInstance);
+        vpnAcList = decompVpnAc(acsByNeMap, webNetL3vpnInstance);
         return new NeData(vpnInstanceList, vpnAcList);
     }
 
-    public List<VpnInstance> decompVpnInstance(Map<String, List<String>> acIdsByNeMap) {
+    public List<VpnInstance> decompVpnInstance(Map<String, List<String>> acIdsByNeMap,
+                                               WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnInstance> vpnInstanceList = new ArrayList<VpnInstance>();
         for (String neId : webNetL3vpnInstance.getNeIdList()) {
             String vrfName = webNetL3vpnInstance.getName();
@@ -88,7 +103,8 @@ public class NetL3vpnDecomp {
         return vpnInstanceList;
     }
 
-    public List<VpnAc> decompVpnAc(Map<String, List<WebAc>> acsByNeMap) {
+    public List<VpnAc> decompVpnAc(Map<String, List<WebAc>> acsByNeMap,
+                                   WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnAc> vpnAcList = new ArrayList<VpnAc>();
         String netVpnId = webNetL3vpnInstance.getId();
         for (String neId : webNetL3vpnInstance.getNeIdList()) {
@@ -99,10 +115,13 @@ public class NetL3vpnDecomp {
                         .getPort(DeviceId.deviceId(neId),
                                  PortNumber.portNumber(webAc.getL2Access()
                                          .getPort().getLtpId()));
-                String acName = port.number().name();
+                String acName = port.annotations()
+                        .value(AnnotationKeys.PORT_NAME);
                 String ipAddress = webAc.getL3Access().getAddress();
-                int subNetMask = Integer.parseInt(webAc.getL3Access().getAddress().split("/")[1]);
-                VpnAc vpnAc = new VpnAc(netVpnId, acId, acName, ipAddress, subNetMask);
+                int subNetMask = Integer.parseInt(webAc.getL3Access()
+                        .getAddress().split("/")[1]);
+                VpnAc vpnAc = new VpnAc(netVpnId, acId, acName, ipAddress,
+                                        subNetMask);
                 vpnAcList.add(vpnAc);
             }
         }
