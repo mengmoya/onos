@@ -1,23 +1,12 @@
-package org.onosproject.l3vpnweb.resources;
+package org.onosproject.netl3vpnweb.codec;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.OK;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.onlab.util.ItemNotFoundException;
-import org.onosproject.netl3vpn.manager.NetL3vpnService;
-import org.onosproject.rest.AbstractWebResource;
+import org.onosproject.codec.CodecContext;
+import org.onosproject.codec.JsonCodec;
 import org.onosproject.yang.gen.v1.l3vpn.comm.type.rev20141225.nel3vpncommtype.Ipv4Address;
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.acgroup.Acs;
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.acgroup.AcsBuilder;
@@ -35,55 +24,28 @@ import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.inst
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.instance.nes.NeBuilder;
 import org.onosproject.yang.gen.v1.net.l3vpn.type.rev20160701.netl3vpntype.l2access.Port;
 import org.onosproject.yang.gen.v1.net.l3vpn.type.rev20160701.netl3vpntype.l2access.PortBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@Path("instance")
-public class L3vpnWebResource extends AbstractWebResource {
-    public static final String INSTANCE_NOT_FOUND = "Instance is not found";
-    public static final String INSTANCE_ID_EXIST = "Instance id is exist";
-    public static final String INSTANCE_ID_NOT_EXIST = "Instance id is not exist";
+public final class InstanceCodec extends JsonCodec<Instance> {
+    public static final String OBJECTNODE_NOT_NULL = "ObjectNode can not be null";
+    public static final String CODECCONTEXT_NOT_NULL = "CodecContext can not be null";
     public static final String JSON_NOT_NULL = "JsonNode can not be null";
-    protected static final Logger log = LoggerFactory
-            .getLogger(L3vpnWebResource.class);
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createInstance(InputStream input) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode cfg = mapper.readTree(input);
-            Instance instance = createInstanceByInputStream(cfg);
-            Boolean issuccess = nullIsNotFound(get(NetL3vpnService.class)
-                    .createL3vpn(instance), INSTANCE_NOT_FOUND);
-            if (!issuccess) {
-                return Response.status(INTERNAL_SERVER_ERROR)
-                        .entity(INSTANCE_ID_EXIST).build();
-            }
-            return Response.status(OK).entity(issuccess.toString()).build();
-        } catch (Exception e) {
-            log.error("Creates instance failed because of exception {}",
-                      e.toString());
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.toString())
-                    .build();
-        }
+    @Override
+    public ObjectNode encode(Instance vPort, CodecContext context) {
+        // TODO
+        return null;
     }
 
-    /**
-     * Returns a Object of the currently known infrastructure instance.
-     *
-     * @param cfg the instance json node
-     * @return a instance
-     */
-    public Instance createInstanceByInputStream(JsonNode cfg) {
-        checkNotNull(cfg, JSON_NOT_NULL);
-        JsonNode instancesNode = cfg.get("instances");
+    @Override
+    public Instance decode(ObjectNode json, CodecContext context) {
+        checkNotNull(json, OBJECTNODE_NOT_NULL);
+        checkNotNull(context, CODECCONTEXT_NOT_NULL);
+        JsonNode instancesNode = json.get("instances");
         if (instancesNode == null) {
-            instancesNode = cfg.get("instance");
+            instancesNode = json.get("instance");
         }
         Instance instance = changeJsonToInstance(instancesNode);
         return instance;
@@ -175,22 +137,4 @@ public class L3vpnWebResource extends AbstractWebResource {
                 .l3Access(l3Access).build();
         return ac;
     }
-
-    /**
-     * Returns the specified item if that items is null; otherwise throws not
-     * found exception.
-     *
-     * @param item item to check
-     * @param <T> item type
-     * @param message not found message
-     * @return item if not null
-     * @throws org.onlab.util.ItemNotFoundException if item is null
-     */
-    protected <T> T nullIsNotFound(T item, String message) {
-        if (item == null) {
-            throw new ItemNotFoundException(message);
-        }
-        return item;
-    }
-
 }
