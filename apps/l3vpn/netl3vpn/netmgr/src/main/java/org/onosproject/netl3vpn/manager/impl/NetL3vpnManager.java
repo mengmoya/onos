@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016-present Open Networking Laboratory
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.onosproject.netl3vpn.manager.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -117,7 +132,6 @@ public class NetL3vpnManager implements NetL3vpnService {
                 .withTimestampProvider((k, v) -> clockService.getTimestamp())
                 .build();
 
-        // Reserve global node pool
         if (!netL3vpnLabelHandler.reserveGlobalPool(GLOBAL_LABEL_SPACE_MIN,
                                                     GLOBAL_LABEL_SPACE_MAX)) {
             log.debug("Global node pool was already reserved.");
@@ -161,10 +175,15 @@ public class NetL3vpnManager implements NetL3vpnService {
         for (VpnAc vpnAc : neData.vpnAcList()) {
             vpnAcStore.put(vpnAc.acId(), vpnAc);
         }
-
         return l3vpnNeService.createL3vpn(neData);
     }
 
+    /**
+     * Check the status of devices for the instance.
+     *
+     * @param instance the specific instance
+     * @return success or failure
+     */
     public boolean checkDeviceStatus(Instance instance) {
         for (Ne ne : instance.nes().ne()) {
             DeviceId deviceId = DeviceId.deviceId(ne.id());
@@ -186,6 +205,11 @@ public class NetL3vpnManager implements NetL3vpnService {
         return true;
     }
 
+    /**
+     * Check the resource is valid or not.
+     *
+     * @return valid or not
+     */
     public boolean checkOccupiedResource() {
         for (Entry<String, WebNetL3vpnInstance> entry : webNetL3vpnStore
                 .entrySet()) {
@@ -196,6 +220,11 @@ public class NetL3vpnManager implements NetL3vpnService {
         return true;
     }
 
+    /**
+     * Apply the node labels from global node label pool.
+     *
+     * @return the allocate resource entity
+     */
     public NetL3VpnAllocateRes applyResource() {
         String routeTarget = netL3vpnLabelHandler
                 .allocateResource(RT, webNetL3vpnInstance);

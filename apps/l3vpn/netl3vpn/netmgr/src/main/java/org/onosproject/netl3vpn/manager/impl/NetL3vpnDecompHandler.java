@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016-present Open Networking Laboratory
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.onosproject.netl3vpn.manager.impl;
 
 import java.util.ArrayList;
@@ -21,11 +36,17 @@ import org.onosproject.netl3vpn.entity.NetL3VpnAllocateRes;
 import org.onosproject.netl3vpn.entity.WebAc;
 import org.onosproject.netl3vpn.entity.WebNetL3vpnInstance;
 
+/**
+ * L3vpn network decompose configuration handler.
+ */
 public final class NetL3vpnDecompHandler {
     private static NetL3vpnDecompHandler netL3vpnDecompHandler = null;
     private NetL3VpnAllocateRes l3VpnAllocateRes;
     private DeviceService deviceService;
 
+    /**
+     * Initializes default values.
+     */
     private NetL3vpnDecompHandler() {
     }
 
@@ -41,12 +62,24 @@ public final class NetL3vpnDecompHandler {
         return netL3vpnDecompHandler;
     }
 
+    /**
+     * Initialization the allocate resource entity and device service.
+     *
+     * @param l3VpnAllocateRes the allocate resource entity
+     * @param deviceService device service
+     */
     public void initialize(NetL3VpnAllocateRes l3VpnAllocateRes,
                            DeviceService deviceService) {
         this.l3VpnAllocateRes = l3VpnAllocateRes;
         this.deviceService = deviceService;
     }
 
+    /**
+     * Decompose the l3vpn network instance to network element data.
+     *
+     * @param webNetL3vpnInstance the l3vpn network instance
+     * @return network element data
+     */
     public NeData decompNeData(WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnInstance> vpnInstanceList = new ArrayList<VpnInstance>();
         List<VpnAc> vpnAcList = new ArrayList<VpnAc>();
@@ -74,6 +107,13 @@ public final class NetL3vpnDecompHandler {
         return new NeData(vpnInstanceList, vpnAcList);
     }
 
+    /**
+     * Decompose the l3vpn network instance to list of vpn instance.
+     *
+     * @param acIdsByNeMap a map of ac ids to each ne
+     * @param webNetL3vpnInstance the l3vpn network instance
+     * @return list of vpn instance
+     */
     public List<VpnInstance> decompVpnInstance(Map<String, List<String>> acIdsByNeMap,
                                                WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnInstance> vpnInstanceList = new ArrayList<VpnInstance>();
@@ -86,7 +126,7 @@ public final class NetL3vpnDecompHandler {
             List<String> exportTargets = l3VpnAllocateRes.getRouteTargets();
             List<String> acIdList = acIdsByNeMap.get(neId);
 
-            BgpImportProtocol bgpImportProtocol = new BgpImportProtocol(ProtocolType.DIRECT);
+            BgpImportProtocol bgpImportProtocol = new BgpImportProtocol(ProtocolType.DIRECT, "0");
             List<BgpImportProtocol> importProtocols = new ArrayList<BgpImportProtocol>();
             importProtocols.add(bgpImportProtocol);
             Bgp bgp = new Bgp(importProtocols);
@@ -103,6 +143,13 @@ public final class NetL3vpnDecompHandler {
         return vpnInstanceList;
     }
 
+    /**
+     * Decompose the l3vpn network instance to list of vpn ac.
+     *
+     * @param acsByNeMap a map of acs entity to each ne
+     * @param webNetL3vpnInstance the l3vpn network instance
+     * @return list of vpn ac
+     */
     public List<VpnAc> decompVpnAc(Map<String, List<WebAc>> acsByNeMap,
                                    WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnAc> vpnAcList = new ArrayList<VpnAc>();

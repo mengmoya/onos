@@ -28,6 +28,9 @@ import org.onosproject.yang.gen.v1.net.l3vpn.type.rev20160701.netl3vpntype.l2acc
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * Instance JSON codec.
+ */
 public final class InstanceCodec extends JsonCodec<Instance> {
     public static final String OBJECTNODE_NOT_NULL = "ObjectNode can not be null";
     public static final String CODECCONTEXT_NOT_NULL = "CodecContext can not be null";
@@ -58,13 +61,12 @@ public final class InstanceCodec extends JsonCodec<Instance> {
      * @return Instance a Instance
      */
     public Instance changeJsonToInstance(JsonNode instancesNode) {
-        // TODO check the fields?
         checkNotNull(instancesNode, JSON_NOT_NULL);
         JsonNode instanceNode = instancesNode.get("instance");
         if (instanceNode == null) {
             instanceNode = instancesNode;
         }
-        InstanceBuilder instanceBuiler = new InstanceBuilder();
+        checkInstanceFields(instanceNode);
         String id = instanceNode.get("id").asText();
         String name = instanceNode.get("name").asText();
         String mode = instanceNode.get("mode").asText();
@@ -72,11 +74,30 @@ public final class InstanceCodec extends JsonCodec<Instance> {
         Nes nes = createNesByJsonNode(nesNode);
         JsonNode acsNode = instanceNode.get("acs");
         Acs acs = createAcsByJsonNode(acsNode);
-        Instance instance = instanceBuiler.id(id).name(name).mode(mode).nes(nes)
-                .acs(acs).build();
+        Instance instance = new InstanceBuilder().id(id).name(name).mode(mode)
+                .nes(nes).acs(acs).build();
         return instance;
     }
 
+    /**
+     * Check the fields of the instance json node.
+     *
+     * @param instanceNode the Instance json node
+     */
+    public void checkInstanceFields(JsonNode instanceNode) {
+        checkNotNull(instanceNode.get("id"), "id " + JSON_NOT_NULL);
+        checkNotNull(instanceNode.get("name"), "name " + JSON_NOT_NULL);
+        checkNotNull(instanceNode.get("mode"), "mode " + JSON_NOT_NULL);
+        checkNotNull(instanceNode.get("nes"), "nes " + JSON_NOT_NULL);
+        checkNotNull(instanceNode.get("acs"), "acs " + JSON_NOT_NULL);
+    }
+
+    /**
+     * Returns the Nes of the Instance from nes json node.
+     *
+     * @param nesNode the nes json node
+     * @return Nes a Nes
+     */
     public Nes createNesByJsonNode(JsonNode nesNode) {
         checkNotNull(nesNode, JSON_NOT_NULL);
         List<Ne> neList = new ArrayList<Ne>();
@@ -93,6 +114,12 @@ public final class InstanceCodec extends JsonCodec<Instance> {
         return nes;
     }
 
+    /**
+     * Returns the Ne of Instance from nes json node.
+     *
+     * @param nesNode the nes json node
+     * @return Ne a Ne
+     */
     public Ne changeJsonToNe(JsonNode nesNode) {
         JsonNode neNode = nesNode.get("nes");
         if (neNode == null) {
@@ -102,6 +129,12 @@ public final class InstanceCodec extends JsonCodec<Instance> {
         return ne;
     }
 
+    /**
+     * Returns the Acs of Instance from acs json node.
+     *
+     * @param acsNode the acs json node
+     * @return Acs a Acs
+     */
     public Acs createAcsByJsonNode(JsonNode acsNode) {
         checkNotNull(acsNode, JSON_NOT_NULL);
         List<Ac> acList = new ArrayList<Ac>();
@@ -118,6 +151,12 @@ public final class InstanceCodec extends JsonCodec<Instance> {
         return acs;
     }
 
+    /**
+     * Returns the Ac of Instance from acs json node.
+     *
+     * @param acsNode the acs json node
+     * @return Ac a Ac
+     */
     public Ac changeJsonToAc(JsonNode acsNode) {
         JsonNode acNode = acsNode.get("acs");
         if (acNode == null) {
