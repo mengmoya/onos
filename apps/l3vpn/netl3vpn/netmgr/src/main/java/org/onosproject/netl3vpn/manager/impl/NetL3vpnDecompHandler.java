@@ -121,7 +121,7 @@ public final class NetL3vpnDecompHandler {
             String vrfName = webNetL3vpnInstance.getName();
             String netVpnId = webNetL3vpnInstance.getId();
             String routeDistinguisher = l3VpnAllocateRes
-                    .getRouteDistinguisher();
+                    .getRouteDistinguisherMap().get(neId);
             List<String> importTargets = l3VpnAllocateRes.getRouteTargets();
             List<String> exportTargets = l3VpnAllocateRes.getRouteTargets();
             List<String> acIdList = acIdsByNeMap.get(neId);

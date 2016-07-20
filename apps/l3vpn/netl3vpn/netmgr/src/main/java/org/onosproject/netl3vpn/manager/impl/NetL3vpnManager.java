@@ -18,7 +18,9 @@ package org.onosproject.netl3vpn.manager.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.felix.scr.annotations.Activate;
@@ -65,8 +67,8 @@ public class NetL3vpnManager implements NetL3vpnService {
     private static final String NETL3INSTANCESTORE = "netl3vpn-instance";
     private static final String NEL3INSTANCESTORE = "nel3vpn-instance";
     private static final String NEL3ACSTORE = "nel3vpn-ac";
-    public static final long GLOBAL_LABEL_SPACE_MIN = 2049;
-    public static final long GLOBAL_LABEL_SPACE_MAX = 3073;
+    private static final long GLOBAL_LABEL_SPACE_MIN = 2049;
+    private static final long GLOBAL_LABEL_SPACE_MAX = 3073;
     protected static final Logger log = LoggerFactory
             .getLogger(NetL3vpnManager.class);
 
@@ -91,10 +93,12 @@ public class NetL3vpnManager implements NetL3vpnService {
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected LabelResourceService labelRsrcService;
 
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    private L3vpnNeService l3vpnNeService;
+
     private ApplicationId appId;
     private WebNetL3vpnInstance webNetL3vpnInstance;
     private NetL3VpnAllocateRes l3VpnAllocateRes;
-    private L3vpnNeService l3vpnNeService;
     private NetL3vpnParseHandler netL3vpnParseHandler;
     private NetL3vpnLabelHandler netL3vpnLabelHandler;
     private NetL3vpnDecompHandler netL3vpnDecompHandler;
@@ -228,18 +232,23 @@ public class NetL3vpnManager implements NetL3vpnService {
     public NetL3VpnAllocateRes applyResource() {
         String routeTarget = netL3vpnLabelHandler
                 .allocateResource(RT, webNetL3vpnInstance);
-        String routeDistinguisher = netL3vpnLabelHandler
-                .allocateResource(RD, webNetL3vpnInstance);
+        Map<String, String> routeDistinguisherMap = new HashMap<String, String>();
+        for (String neId : webNetL3vpnInstance.getNeIdList()) {
+            String routeDistinguisher = netL3vpnLabelHandler
+                    .allocateResource(RD, webNetL3vpnInstance);
+            routeDistinguisherMap.put(neId, routeDistinguisher);
+        }
+
         String vrfName = netL3vpnLabelHandler
                 .allocateResource(VRF, webNetL3vpnInstance);
-        if (routeTarget == null || routeDistinguisher == null
+        if (routeTarget == null || routeDistinguisherMap == null
                 || vrfName == null) {
             return null;
         }
 
         List<String> routeTargets = new ArrayList<String>();
         routeTargets.add(routeTarget);
-        return new NetL3VpnAllocateRes(routeTargets, routeDistinguisher,
+        return new NetL3VpnAllocateRes(routeTargets, routeDistinguisherMap,
                                        vrfName);
     }
 }
