@@ -53,12 +53,12 @@ public class HuaWeiL3vpnConfig extends AbstractHandlerBehaviour
                                           ERROR_OPERATION, CONFIG_XMLNS,
                                           netconfL3vpn);
         String requestMessage = l3vpnDocument.asXML().replaceAll(DEFAULT_NAMESPACE, "");
-        boolean reply;
+        log.debug("Vrf requestMessage is :{}", requestMessage);
+        boolean reply = false;
         try {
             reply = session.editConfig(requestMessage);
         } catch (NetconfException e) {
-            throw new RuntimeException(new NetconfException("Failed to create virtual routing forwarding.",
-                                                            e));
+            log.error("Failed to create virtual routing forwarding. Caused by:{}", e);
         }
         return reply;
     }
@@ -76,12 +76,12 @@ public class HuaWeiL3vpnConfig extends AbstractHandlerBehaviour
                                         ERROR_OPERATION, CONFIG_XMLNS,
                                         netconfBgp);
         String requestMessage = bgpDocument.asXML().replaceAll(DEFAULT_NAMESPACE, "");
-        boolean reply;
+        log.debug("Bgp requestMessage is :{}", requestMessage);
+        boolean reply = false;
         try {
             reply = session.editConfig(requestMessage);
         } catch (NetconfException e) {
-            throw new RuntimeException(new NetconfException("Failed to create bgp import protocol.",
-                                                            e));
+            log.error("Failed to create bgp import protocol. Caused by:{}", e);
         }
         return reply;
     }
