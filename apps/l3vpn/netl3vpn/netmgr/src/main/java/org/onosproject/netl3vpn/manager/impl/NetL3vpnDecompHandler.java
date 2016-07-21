@@ -118,7 +118,7 @@ public final class NetL3vpnDecompHandler {
                                                WebNetL3vpnInstance webNetL3vpnInstance) {
         List<VpnInstance> vpnInstanceList = new ArrayList<VpnInstance>();
         for (String neId : webNetL3vpnInstance.getNeIdList()) {
-            String vrfName = webNetL3vpnInstance.getName();
+            String vrfName = l3VpnAllocateRes.getVrfName();
             String netVpnId = webNetL3vpnInstance.getId();
             String routeDistinguisher = l3VpnAllocateRes
                     .getRouteDistinguisherMap().get(neId);

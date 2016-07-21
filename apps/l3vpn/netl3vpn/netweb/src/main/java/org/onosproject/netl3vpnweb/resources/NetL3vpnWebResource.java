@@ -27,7 +27,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.onlab.util.ItemNotFoundException;
 import org.onosproject.netl3vpn.manager.NetL3vpnService;
 import org.onosproject.rest.AbstractWebResource;
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.Instance;
@@ -42,10 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Path("instance")
 public class NetL3vpnWebResource extends AbstractWebResource {
-    public static final String INSTANCE_NOT_FOUND = "Instance is not found";
-    public static final String INSTANCE_ID_EXIST = "Instance id is exist";
-    public static final String INSTANCE_ID_NOT_EXIST = "Instance id is not exist";
-    public static final String JSON_NOT_NULL = "JsonNode can not be null";
+    public static final String CREATE_INSTANCE_FAILED = "Create instance failed";
     protected static final Logger log = LoggerFactory
             .getLogger(NetL3vpnWebResource.class);
 
@@ -55,12 +51,13 @@ public class NetL3vpnWebResource extends AbstractWebResource {
     public Response createInstance(InputStream input) {
         try {
             JsonNode cfg = this.mapper().readTree(input);
-            Instance instance = codec(Instance.class).decode((ObjectNode) cfg, this);
-            Boolean issuccess = nullIsNotFound(get(NetL3vpnService.class)
-                    .createL3vpn(instance), INSTANCE_NOT_FOUND);
+            Instance instance = codec(Instance.class).decode((ObjectNode) cfg,
+                                                             this);
+            Boolean issuccess = get(NetL3vpnService.class)
+                    .createL3vpn(instance);
             if (!issuccess) {
                 return Response.status(INTERNAL_SERVER_ERROR)
-                        .entity(INSTANCE_ID_EXIST).build();
+                        .entity(CREATE_INSTANCE_FAILED).build();
             }
             return Response.status(OK).entity(issuccess.toString()).build();
         } catch (Exception e) {
@@ -70,22 +67,4 @@ public class NetL3vpnWebResource extends AbstractWebResource {
                     .build();
         }
     }
-
-    /**
-     * Returns the specified item if that items is null; otherwise throws not
-     * found exception.
-     *
-     * @param item item to check
-     * @param <T> item type
-     * @param message not found message
-     * @return item if not null
-     * @throws org.onlab.util.ItemNotFoundException if item is null
-     */
-    protected <T> T nullIsNotFound(T item, String message) {
-        if (item == null) {
-            throw new ItemNotFoundException(message);
-        }
-        return item;
-    }
-
 }

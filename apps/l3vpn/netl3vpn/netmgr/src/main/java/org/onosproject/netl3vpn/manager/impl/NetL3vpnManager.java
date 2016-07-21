@@ -165,7 +165,6 @@ public class NetL3vpnManager implements NetL3vpnService {
             log.debug("The resource of l3vpn instance is occupied.");
             return false;
         }
-        webNetL3vpnStore.put(webNetL3vpnInstance.getId(), webNetL3vpnInstance);
         l3VpnAllocateRes = applyResource();
         if (l3VpnAllocateRes == null) {
             log.debug("Apply resources of l3vpn instance failed.");
@@ -173,13 +172,18 @@ public class NetL3vpnManager implements NetL3vpnService {
         }
         netL3vpnDecompHandler.initialize(l3VpnAllocateRes, deviceService);
         NeData neData = netL3vpnDecompHandler.decompNeData(webNetL3vpnInstance);
-        for (VpnInstance vpnInstance : neData.vpnInstanceList()) {
-            vpnInstanceStore.put(vpnInstance.neId(), vpnInstance);
+        if (l3vpnNeService.createL3vpn(neData)) {
+            webNetL3vpnStore.put(webNetL3vpnInstance.getId(),
+                                 webNetL3vpnInstance);
+            for (VpnInstance vpnInstance : neData.vpnInstanceList()) {
+                vpnInstanceStore.put(vpnInstance.neId(), vpnInstance);
+            }
+            for (VpnAc vpnAc : neData.vpnAcList()) {
+                vpnAcStore.put(vpnAc.acId(), vpnAc);
+            }
+            return true;
         }
-        for (VpnAc vpnAc : neData.vpnAcList()) {
-            vpnAcStore.put(vpnAc.acId(), vpnAc);
-        }
-        return l3vpnNeService.createL3vpn(neData);
+        return false;
     }
 
     /**
@@ -217,7 +221,8 @@ public class NetL3vpnManager implements NetL3vpnService {
     public boolean checkOccupiedResource() {
         for (Entry<String, WebNetL3vpnInstance> entry : webNetL3vpnStore
                 .entrySet()) {
-            if (entry.getValue().getName() == webNetL3vpnInstance.getName()) {
+            if ((entry.getKey() == webNetL3vpnInstance.getId()) || (entry
+                    .getValue().getName() == webNetL3vpnInstance.getName())) {
                 return false;
             }
         }
