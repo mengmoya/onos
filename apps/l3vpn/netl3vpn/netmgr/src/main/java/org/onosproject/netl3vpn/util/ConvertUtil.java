@@ -30,6 +30,9 @@ import org.onosproject.yang.gen.v1.net.l3vpn.type.rev20160701.netl3vpntype.l2acc
  */
 public final class ConvertUtil {
 
+    /**
+     * Initializes default values.
+     */
     private ConvertUtil() {
     }
 

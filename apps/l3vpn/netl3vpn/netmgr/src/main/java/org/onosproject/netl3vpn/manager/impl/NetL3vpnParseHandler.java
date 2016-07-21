@@ -27,12 +27,15 @@ import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.Inst
 import org.onosproject.yang.gen.v1.net.l3vpn.rev20160701.netl3vpn.instances.instance.nes.Ne;
 
 /**
- * Net l3 vpn parse configuration handler.
+ * L3vpn network parse configuration handler.
  */
 public final class NetL3vpnParseHandler {
     private static NetL3vpnParseHandler netL3vpnParseHandler = null;
     private Instance instance;
 
+    /**
+     * Initializes default values.
+     */
     private NetL3vpnParseHandler() {
     }
 
@@ -48,10 +51,20 @@ public final class NetL3vpnParseHandler {
         return netL3vpnParseHandler;
     }
 
+    /**
+     * Initialization the instance.
+     *
+     * @param instance the specific instance
+     */
     public void initialize(Instance instance) {
         this.instance = instance;
     }
 
+    /**
+     * Return a WebNetL3vpnInstance of parsing the configuration for instance .
+     *
+     * @return WebNetL3vpnInstance a WebNetL3vpnInstance
+     */
     public WebNetL3vpnInstance cfgParse() {
         List<String> neIdList = new ArrayList<String>();
         for (Ne ne : instance.nes().ne()) {

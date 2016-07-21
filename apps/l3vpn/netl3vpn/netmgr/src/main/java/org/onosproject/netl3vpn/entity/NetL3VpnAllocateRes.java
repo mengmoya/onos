@@ -16,13 +16,14 @@
 package org.onosproject.netl3vpn.entity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Resource allocate class.
  */
 public final class NetL3VpnAllocateRes {
     private final List<String> routeTargets;
-    private final String routeDistinguisher;
+    private final Map<String, String> routeDistinguisherMap;
     private final String vrfName;
 
     /**
@@ -33,9 +34,9 @@ public final class NetL3VpnAllocateRes {
      * @param vrfName
      */
     public NetL3VpnAllocateRes(List<String> routeTargets,
-                               String routeDistinguisher, String vrfName) {
+                               Map<String, String> routeDistinguisherMap, String vrfName) {
         this.routeTargets = routeTargets;
-        this.routeDistinguisher = routeDistinguisher;
+        this.routeDistinguisherMap = routeDistinguisherMap;
         this.vrfName = vrfName;
     }
 
@@ -49,12 +50,12 @@ public final class NetL3VpnAllocateRes {
     }
 
     /**
-     * Returns the route distinguisher.
+     * Returns the map of route distinguisher.
      *
-     * @return route distinguisher
+     * @return map of route distinguisher
      */
-    public String getRouteDistinguisher() {
-        return routeDistinguisher;
+    public Map<String, String> getRouteDistinguisherMap() {
+        return routeDistinguisherMap;
     }
 
     /**
