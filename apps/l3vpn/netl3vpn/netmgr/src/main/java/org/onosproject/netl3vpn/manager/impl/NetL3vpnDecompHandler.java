@@ -135,9 +135,9 @@ public final class NetL3vpnDecompHandler {
                                                 routeDistinguisher,
                                                 importTargets, exportTargets,
                                                 acIdList, bgp);
-            List<VrfEntity> vrfEntities = new ArrayList<VrfEntity>();
-            vrfEntities.add(vrfEntity);
-            VpnInstance vpnInstance = new VpnInstance(neId, vrfEntities);
+            List<VrfEntity> vrfList = new ArrayList<VrfEntity>();
+            vrfList.add(vrfEntity);
+            VpnInstance vpnInstance = new VpnInstance(neId, vrfList);
             vpnInstanceList.add(vpnInstance);
         }
         return vpnInstanceList;
@@ -146,7 +146,7 @@ public final class NetL3vpnDecompHandler {
     /**
      * Decompose the l3vpn network instance to list of vpn ac.
      *
-     * @param acsByNeMap a map of acs entity to each ne
+     * @param acsByNeMap a map of ac entities to each ne
      * @param webNetL3vpnInstance the l3vpn network instance
      * @return list of vpn ac
      */

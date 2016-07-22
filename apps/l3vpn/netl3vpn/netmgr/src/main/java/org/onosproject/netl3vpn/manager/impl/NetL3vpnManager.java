@@ -67,8 +67,8 @@ public class NetL3vpnManager implements NetL3vpnService {
     private static final String NETL3INSTANCESTORE = "netl3vpn-instance";
     private static final String NEL3INSTANCESTORE = "nel3vpn-instance";
     private static final String NEL3ACSTORE = "nel3vpn-ac";
-    private static final long GLOBAL_LABEL_SPACE_MIN = 2049;
-    private static final long GLOBAL_LABEL_SPACE_MAX = 3073;
+    private static final long GLOBAL_LABEL_SPACE_MIN = 1;
+    private static final long GLOBAL_LABEL_SPACE_MAX = Long.MAX_VALUE;
     protected static final Logger log = LoggerFactory
             .getLogger(NetL3vpnManager.class);
 
